@@ -3,7 +3,7 @@
 #########
 
 module "container_registry_name" {
-  source = "git::https://github.com/gccloudone-aurora-iac/terraform-aurora-azure-resource-names-global.git?ref=v1.0.0"
+  source = "git::https://github.com/gccloudone-aurora-iac/terraform-aurora-azure-resource-names-global.git?ref=v2.0.0"
 
   user_defined = var.user_defined
 }
@@ -90,7 +90,7 @@ resource "azurerm_container_registry" "this" {
 resource "azurerm_private_endpoint" "this" {
   for_each = { for index, endpoint in var.private_endpoints : index => endpoint }
 
-  name                = "${module.azure_resource_prefixes.private_endpoint_prefix}-${var.user_defined}-${each.value.sub_resource_name}"
+  name                = "${module.azure_resource_names.private_endpoint_name}-${var.user_defined}-${each.value.sub_resource_name}"
   location            = var.azure_resource_attributes.location
   resource_group_name = var.resource_group_name
   subnet_id           = each.value.subnet_id
@@ -101,7 +101,7 @@ resource "azurerm_private_endpoint" "this" {
   }
 
   private_service_connection {
-    name                           = "${module.azure_resource_prefixes.private_endpoint_prefix}-${var.user_defined}-${each.value.sub_resource_name}"
+    name                           = "${module.azure_resource_names.private_endpoint_name}-${var.user_defined}-${each.value.sub_resource_name}"
     private_connection_resource_id = azurerm_container_registry.this.id
     is_manual_connection           = false
     subresource_names              = [each.value.sub_resource_name]
