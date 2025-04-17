@@ -2,12 +2,6 @@
 ## ACR ##
 #########
 
-module "container_registry_name" {
-  source = "git::https://github.com/gccloudone-aurora-iac/terraform-aurora-azure-resource-names-global.git?ref=v2.0.0"
-
-  user_defined = var.user_defined
-}
-
 resource "azurerm_container_registry" "this" {
   name                = module.container_registry_name.container_registry_name
   resource_group_name = var.resource_group_name
@@ -26,13 +20,6 @@ resource "azurerm_container_registry" "this" {
       for ip_range in var.ip_rules : {
         action   = "Allow"
         ip_range = ip_range
-      }
-    ]
-
-    virtual_network = [
-      for subnet_id in var.service_endpoint_subnet_ids : {
-        action    = "Allow"
-        subnet_id = subnet_id
       }
     ]
   }
@@ -69,7 +56,6 @@ resource "azurerm_container_registry" "this" {
   dynamic "encryption" {
     for_each = var.cmk_encryption != null ? ["encryption"] : []
     content {
-      enabled            = true
       key_vault_key_id   = encryption.value.key_vault_key_id
       identity_client_id = encryption.value.identity_client_id
     }
